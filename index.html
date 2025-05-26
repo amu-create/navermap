@@ -4,8 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>네이버 지도 API 테스트</title>
-    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=me6liq8hnh&submodules=geocoder"></script>
     <link rel="stylesheet" href="style.css">
+    <!-- 스크립트 로드 방식 변경 -->
+    <script type="text/javascript">
+        // 동적으로 스크립트 로드
+        function loadNaverMapsScript() {
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=me6liq8hnh&submodules=geocoder';
+            script.async = true;
+            script.onload = function() {
+                console.log('네이버 맵 API 로드 완료');
+                // 지도 초기화
+                if (typeof initMap === 'function') {
+                    initMap();
+                }
+            };
+            script.onerror = function() {
+                console.error('네이버 맵 API 로드 실패');
+                document.getElementById('map').innerHTML = `
+                    <div class="error-message">
+                        <h3>지도를 불러올 수 없습니다</h3>
+                        <p>네이버 클라우드 플랫폼에서 도메인 설정을 확인해주세요.</p>
+                        <p>현재 URL: ${window.location.origin}</p>
+                        <a href="setup-guide.html" class="btn">설정 가이드 보기</a>
+                    </div>
+                `;
+            };
+            document.head.appendChild(script);
+        }
+
+        // DOM 로드 완료 시 스크립트 로드
+        document.addEventListener('DOMContentLoaded', loadNaverMapsScript);
+    </script>
 </head>
 <body>
     <div class="container">
@@ -19,26 +50,14 @@
         <div id="info-panel">
             <h2>장소 정보</h2>
             <div id="place-info">장소를 검색하거나 지도에서 마커를 클릭하세요.</div>
-            <p class="note">※ 참고: 이 페이지는 로컬에서만 동작합니다. 네이버 클라우드 플랫폼에서 도메인 등록이 필요합니다.</p>
+            <p class="note">※ 참고: 네이버 클라우드 플랫폼에서 현재 도메인(<span id="current-domain"></span>)이 등록되어 있어야 합니다.</p>
         </div>
     </div>
-    <script src="script.js"></script>
+
     <script>
-        // 추가 오류 핸들링
-        window.onerror = function(message, source, lineno, colno, error) {
-            if (message.includes('Authentication') || message.includes('인증')) {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'error-message';
-                errorDiv.innerHTML = `
-                    <h3>네이버 지도 API 인증 오류</h3>
-                    <p>네이버 클라우드 플랫폼에서 다음 URL을 등록해야 합니다:</p>
-                    <code>${window.location.origin}</code>
-                    <p>자세한 내용은 <a href="https://api.ncloud-docs.com/docs/ko/application-maps-overview" target="_blank">네이버 클라우드 플랫폼 문서</a>를 참조하세요.</p>
-                `;
-                document.querySelector('.container').prepend(errorDiv);
-            }
-            return false;
-        };
+        // 현재 도메인 표시
+        document.getElementById('current-domain').textContent = window.location.origin;
     </script>
+    <script src="script.js"></script>
 </body>
 </html>
