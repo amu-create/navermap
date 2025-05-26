@@ -5,23 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>네이버 지도 API 테스트</title>
     <link rel="stylesheet" href="style.css">
-    <!-- 스크립트 로드 방식 변경 -->
-    <script type="text/javascript">
-        // 동적으로 스크립트 로드
+</head>
+<body>
+    <div class="container">
+        <h1>네이버 지도 API 테스트</h1>
+        
+        <div class="setup-info">
+            <p>테스트 중인 URL: <strong id="current-url"></strong></p>
+            <p>네이버 API 클라이언트 ID: <span id="client-id">me6liq8hnh</span></p>
+            
+            <div class="api-status">
+                <div class="loading-info">
+                    <div class="loading-spinner"></div>
+                    <p>네이버 지도 API 로딩 중...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="map-controls">
+            <input type="text" id="search-input" placeholder="장소 검색">
+            <button id="search-btn">검색</button>
+            <button id="current-location">현재 위치</button>
+        </div>
+        
+        <div id="map">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>지도를 불러오는 중...</p>
+            </div>
+        </div>
+        
+        <div id="info-panel">
+            <h2>장소 정보</h2>
+            <div id="place-info">장소를 검색하거나 지도에서 마커를 클릭하세요.</div>
+            <div class="troubleshooting">
+                <h3>설정 안내</h3>
+                <p>지도가 표시되지 않는 경우, 네이버 클라우드 플랫폼에서 다음 도메인을 등록해야 합니다:</p>
+                <code id="domain-to-register"></code>
+                <p><a href="setup-guide.html" class="btn">자세한 설정 가이드 보기</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 현재 도메인 정보 표시
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('domain-to-register').textContent = window.location.origin;
+        
+        // API 클라이언트 ID
+        const clientId = 'me6liq8hnh';
+        
+        // 네이버 맵 API 동적 로드
         function loadNaverMapsScript() {
             const script = document.createElement('script');
             script.type = 'text/javascript';
-            script.src = 'https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=me6liq8hnh&submodules=geocoder';
+            script.src = `https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}&submodules=geocoder`;
             script.async = true;
+            
             script.onload = function() {
-                console.log('네이버 맵 API 로드 완료');
-                // 지도 초기화
-                if (typeof initMap === 'function') {
-                    initMap();
-                }
+                document.querySelector('.loading-info').innerHTML = '<p class="success">✓ 네이버 지도 API 로드 완료</p>';
+                // script.js 로드
+                const scriptJs = document.createElement('script');
+                scriptJs.src = 'script.js';
+                document.body.appendChild(scriptJs);
             };
+            
             script.onerror = function() {
-                console.error('네이버 맵 API 로드 실패');
+                document.querySelector('.loading-info').innerHTML = 
+                    '<p class="error">✗ 네이버 지도 API 로드 실패</p>';
                 document.getElementById('map').innerHTML = `
                     <div class="error-message">
                         <h3>지도를 불러올 수 없습니다</h3>
@@ -31,33 +82,12 @@
                     </div>
                 `;
             };
+            
             document.head.appendChild(script);
         }
-
+        
         // DOM 로드 완료 시 스크립트 로드
         document.addEventListener('DOMContentLoaded', loadNaverMapsScript);
     </script>
-</head>
-<body>
-    <div class="container">
-        <h1>네이버 지도 API 테스트</h1>
-        <div class="map-controls">
-            <input type="text" id="search-input" placeholder="장소 검색">
-            <button id="search-btn">검색</button>
-            <button id="current-location">현재 위치</button>
-        </div>
-        <div id="map"></div>
-        <div id="info-panel">
-            <h2>장소 정보</h2>
-            <div id="place-info">장소를 검색하거나 지도에서 마커를 클릭하세요.</div>
-            <p class="note">※ 참고: 네이버 클라우드 플랫폼에서 현재 도메인(<span id="current-domain"></span>)이 등록되어 있어야 합니다.</p>
-        </div>
-    </div>
-
-    <script>
-        // 현재 도메인 표시
-        document.getElementById('current-domain').textContent = window.location.origin;
-    </script>
-    <script src="script.js"></script>
 </body>
 </html>

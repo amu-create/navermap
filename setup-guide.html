@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>네이버 맵 API 안내</title>
+    <title>네이버 클라우드 플랫폼 설정 가이드</title>
     <style>
         body {
             font-family: 'Malgun Gothic', sans-serif;
@@ -13,30 +13,62 @@
             margin: 0 auto;
             padding: 20px;
         }
+        
         h1 {
             color: #03c75a;
             border-bottom: 2px solid #03c75a;
             padding-bottom: 10px;
         }
+        
         h2 {
             color: #0068c3;
             margin-top: 30px;
+            border-left: 4px solid #0068c3;
+            padding-left: 10px;
         }
+        
+        .alert {
+            background-color: #fff4e5;
+            padding: 15px;
+            border-left: 4px solid #ff9800;
+            margin: 20px 0;
+        }
+        
+        .success {
+            background-color: #e6ffe6;
+            padding: 15px;
+            border-left: 4px solid #00c853;
+            margin: 20px 0;
+        }
+        
         .steps {
             background-color: #f5f5f5;
             padding: 20px;
             border-radius: 8px;
             margin: 20px 0;
         }
+        
         .steps li {
             margin-bottom: 15px;
         }
+        
         code {
             background-color: #f0f0f0;
             padding: 2px 6px;
             border-radius: 4px;
             font-family: Consolas, monospace;
         }
+        
+        .code-block {
+            display: block;
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
         .btn {
             display: inline-block;
             background-color: #03c75a;
@@ -45,65 +77,175 @@
             text-decoration: none;
             border-radius: 4px;
             margin-top: 20px;
+            font-weight: bold;
         }
+        
         .btn:hover {
             background-color: #02a54b;
         }
-        .note {
-            background-color: #fff4e5;
-            padding: 15px;
-            border-left: 4px solid #ff9800;
+        
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             margin: 20px 0;
+        }
+        
+        .note {
+            background-color: #e6f3ff;
+            padding: 15px;
+            border-left: 4px solid #2196F3;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        
+        .troubleshooting {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .troubleshooting h3 {
+            color: #d32f2f;
+            margin-top: 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
     </style>
 </head>
 <body>
-    <h1>네이버 맵 API 설정 안내</h1>
+    <h1>네이버 클라우드 플랫폼 Maps API 설정 가이드</h1>
     
-    <div class="note">
-        <p>현재 사이트에서 네이버 맵 API 인증 오류가 발생했습니다. 아래 안내에 따라 네이버 클라우드 플랫폼에서 설정을 변경해주세요.</p>
+    <div class="alert">
+        <p><strong>인증 오류 문제:</strong> 네이버 지도 API는 보안상의 이유로 등록된 웹 서비스 URL에서만 API를 사용할 수 있습니다. 현재 도메인이 네이버 클라우드 플랫폼에 등록되어 있지 않아 인증 오류가 발생했습니다.</p>
     </div>
     
-    <h2>오류 원인</h2>
-    <p>네이버 지도 API는 보안상의 이유로 등록된 웹 서비스 URL에서만 API를 사용할 수 있도록 제한하고 있습니다. 현재 GitHub Pages에서 호스팅 중인 도메인(<code>amu-create.github.io</code>)이 네이버 클라우드 플랫폼에 등록되어 있지 않아 인증 오류가 발생했습니다.</p>
+    <h2>1. 네이버 클라우드 플랫폼 로그인 및 애플리케이션 접근</h2>
     
-    <h2>해결 방법</h2>
     <div class="steps">
         <ol>
             <li><a href="https://www.ncloud.com/" target="_blank">네이버 클라우드 플랫폼</a>에 로그인합니다.</li>
-            <li>콘솔 메뉴로 이동합니다.</li>
-            <li>AI·Application &gt; Maps 서비스로 이동합니다.</li>
-            <li>Application 탭에서 현재 사용 중인 애플리케이션을 선택합니다.</li>
-            <li>Web 서비스 URL 섹션에서 다음 URL을 추가합니다:
-                <ul>
-                    <li><code>https://amu-create.github.io</code></li>
-                    <li><code>https://amu-create.github.io/navermap/</code></li>
-                </ul>
-            </li>
-            <li>변경사항을 저장합니다.</li>
-            <li>몇 분 후 페이지를 새로고침하여 다시 확인합니다.</li>
+            <li>로그인 후 우측 상단의 <strong>콘솔</strong> 버튼을 클릭합니다.</li>
+            <li>왼쪽 메뉴에서 <strong>AI・Application</strong> &gt; <strong>Maps</strong>를 선택합니다.</li>
+            <li>Maps 서비스 페이지에서 <strong>Application</strong> 탭을 클릭합니다.</li>
         </ol>
     </div>
     
-    <h2>로컬 테스트 방법</h2>
-    <p>네이버 클라우드 플랫폼 설정을 변경하기 전에 로컬에서 테스트하려면:</p>
+    <h2>2. Web 서비스 URL 등록</h2>
+    
     <div class="steps">
         <ol>
-            <li>네이버 클라우드 플랫폼에서 <code>localhost</code> 또는 <code>127.0.0.1</code>을 Web 서비스 URL에 추가합니다.</li>
-            <li>간단한 로컬 웹 서버를 실행하여 테스트합니다. 다음과 같은 방법이 있습니다:
+            <li>등록된 애플리케이션을 찾아 클릭합니다. (Client ID: <code>me6liq8hnh</code>)</li>
+            <li><strong>Web 서비스 URL</strong> 섹션을 찾습니다.</li>
+            <li><strong>추가</strong> 버튼을 클릭하고 다음 URL을 각각 등록합니다:
                 <ul>
-                    <li>Python 사용: <code>python -m http.server</code> 명령어 실행</li>
-                    <li>Node.js 사용: <code>npx serve</code> 명령어 실행</li>
-                    <li>Visual Studio Code Live Server 확장 프로그램 사용</li>
+                    <li>GitHub Pages 환경: <code class="code-block" id="github-url">https://amu-create.github.io</code></li>
+                    <li>로컬 테스트 환경: <code class="code-block">http://localhost:8000</code></li>
                 </ul>
             </li>
-            <li>브라우저에서 <code>http://localhost:8000</code> 또는 서버가 제공하는 URL로 접속합니다.</li>
+            <li><strong>저장</strong> 버튼을 클릭합니다.</li>
         </ol>
     </div>
     
-    <h2>추가 정보</h2>
-    <p>네이버 지도 API 관련 자세한 내용은 <a href="https://api.ncloud-docs.com/docs/ko/application-maps-overview" target="_blank">네이버 클라우드 플랫폼 Maps API 문서</a>를 참조하세요.</p>
+    <div class="note">
+        <p><strong>중요:</strong> 도메인을 등록할 때 다음 사항에 주의하세요:</p>
+        <ul>
+            <li>URL 끝에 슬래시(/)를 포함하지 마세요. 예: <code>https://amu-create.github.io</code> (O), <code>https://amu-create.github.io/</code> (X)</li>
+            <li>변경사항이 적용되는 데 최대 10-15분이 소요될 수 있습니다.</li>
+            <li>로컬 테스트용으로는 <code>http://localhost</code> 또는 <code>http://localhost:포트번호</code> 형태로 등록합니다.</li>
+        </ul>
+    </div>
+    
+    <h2>3. API 인증 확인</h2>
+    
+    <div class="steps">
+        <ol>
+            <li>도메인 등록 후 약 5-15분 정도 기다립니다.</li>
+            <li>웹 브라우저를 새로고침하거나 다시 접속해봅니다.</li>
+            <li>로컬 환경에서 테스트하려면:
+                <div class="code-block">python -m http.server</div>
+                를 실행하고 <a href="http://localhost:8000" target="_blank">http://localhost:8000</a>으로 접속합니다.
+            </li>
+            <li>GitHub Pages 환경에서 테스트하려면 <a href="https://amu-create.github.io/navermap/" target="_blank">https://amu-create.github.io/navermap/</a>로 접속합니다.</li>
+        </ol>
+    </div>
+    
+    <h2>4. 문제 해결</h2>
+    
+    <div class="troubleshooting">
+        <h3>인증 오류가 계속 발생하는 경우</h3>
+        <table>
+            <tr>
+                <th>문제</th>
+                <th>해결 방법</th>
+            </tr>
+            <tr>
+                <td>등록한 URL과 접속 URL이 정확히 일치하지 않음</td>
+                <td>
+                    <ul>
+                        <li>프로토콜(http/https)이 정확히 일치하는지 확인</li>
+                        <li>포트번호가 있는 경우 포트번호까지 정확히 등록</li>
+                        <li>대소문자 구분에 주의</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>변경사항 적용 시간 부족</td>
+                <td>네이버 클라우드 플랫폼에서 설정 변경 후 최대 15분까지 기다려보세요.</td>
+            </tr>
+            <tr>
+                <td>브라우저 캐시 문제</td>
+                <td>브라우저 캐시를 비우거나 시크릿/프라이빗 모드에서 접속해보세요.</td>
+            </tr>
+            <tr>
+                <td>클라이언트 ID 문제</td>
+                <td>올바른 클라이언트 ID를 사용하고 있는지 확인하세요.</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="success">
+        <p><strong>로컬 서버 실행 중인지 확인:</strong> 로컬에서 테스트할 때는 반드시 웹 서버가 실행 중이어야 합니다. 터미널에서 <code>python -m http.server</code> 명령어가 실행 중인지 확인하세요.</p>
+    </div>
+    
+    <h2>5. 추가 정보</h2>
+    
+    <p>네이버 지도 API 관련 자세한 내용은 다음 문서를 참조하세요:</p>
+    
+    <ul>
+        <li><a href="https://api.ncloud-docs.com/docs/ko/application-maps-overview" target="_blank">네이버 클라우드 플랫폼 Maps API 문서</a></li>
+        <li><a href="https://api.ncloud-docs.com/docs/ko/application-maps-tutorial" target="_blank">네이버 Maps API 튜토리얼</a></li>
+        <li><a href="https://api.ncloud-docs.com/docs/ko/application-maps-error-code" target="_blank">오류 코드 목록</a></li>
+    </ul>
     
     <a href="index.html" class="btn">메인 페이지로 돌아가기</a>
+    
+    <script>
+        // 현재 GitHub URL 표시
+        document.getElementById('github-url').textContent = 'https://amu-create.github.io';
+    </script>
 </body>
 </html>

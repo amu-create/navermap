@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>네이버 지도 API 기본 테스트</title>
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=me6liq8hnh"></script>
+    <style>
+        #map { width: 100%; height: 400px; }
+        .error { color: red; margin: 20px 0; padding: 10px; border: 1px solid red; }
+    </style>
+</head>
+<body>
+    <h1>네이버 지도 API 기본 테스트</h1>
+    <div id="error-message"></div>
+    <div id="map"></div>
+    <div>
+        <p>테스트 중인 URL: <strong id="current-url"></strong></p>
+        <p>테스트 시간: <strong id="current-time"></strong></p>
+    </div>
+
+    <script>
+        // 현재 URL 및 시간 표시
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('current-time').textContent = new Date().toLocaleString();
+
+        // 오류 메시지 처리
+        window.onerror = function(message) {
+            if (message.includes('Authentication') || message.includes('인증')) {
+                document.getElementById('error-message').innerHTML = 
+                    '<div class="error">네이버 맵 API 인증 오류: 네이버 클라우드 플랫폼에서 도메인 등록이 필요합니다.</div>';
+            }
+        };
+
+        // 지도 초기화 시도
+        try {
+            var mapOptions = {
+                center: new naver.maps.LatLng(37.5666805, 126.9784147),
+                zoom: 14
+            };
+            var map = new naver.maps.Map('map', mapOptions);
+            
+            // 지도 생성 성공 확인
+            if (map) {
+                console.log('지도 생성 성공!');
+            }
+        } catch (e) {
+            console.error('지도 초기화 오류:', e);
+            document.getElementById('error-message').innerHTML = 
+                '<div class="error">지도 초기화 오류: ' + e.message + '</div>';
+        }
+    </script>
+</body>
+</html>
