@@ -1,0 +1,24 @@
+# 시스템 파일
+.DS_Store
+Thumbs.db
+
+# 에디터 설정
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# 로그 파일
+*.log
+
+# 개인 API 키 설정 파일 (나중에 사용할 수 있음)
+api_keys.js
+
+# 백업 파일
+*.bak
+*~
+*.swp
+
+# 노드 모듈 (나중에 필요할 수 있음)
+node_modules/
+package-lock.json

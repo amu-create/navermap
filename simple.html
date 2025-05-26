@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>네이버 지도 간단 테스트</title>
+    <style>
+        #map {
+            width: 100%;
+            height: 500px;
+        }
+        .category-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .category-buttons button {
+            padding: 8px 15px;
+            background-color: #03c75a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .category-buttons button:hover {
+            background-color: #02a64b;
+        }
+        #findGym { background-color: #ff5722; }
+        #findPark { background-color: #4caf50; }
+        #findTrail { background-color: #2196f3; }
+        #findSports { background-color: #9c27b0; }
+        #findAll { background-color: #e91e63; }
+    </style>
+</head>
+<body>
+    <h1>네이버 지도 API 테스트</h1>
+    <div class="category-buttons">
+        <button id="findGym">헬스장 찾기</button>
+        <button id="findPark">공원 찾기</button>
+        <button id="findTrail">산책로 찾기</button>
+        <button id="findSports">스포츠 시설 찾기</button>
+        <button id="findAll">주변 운동 시설 모두</button>
+    </div>
+    <div id="map"></div>
+    <p id="status">상태: 초기화 중...</p>
+
+    <!-- 네이버 지도 API 직접 로드 -->
+    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=me6liq8hnh"></script>
+    
+    <script>
+        // 전역 변수
+        let map;
+        let markers = [];
+        let infoWindow;
+        
+        // 지도 초기화
+        function initMap() {
+            map = new naver.maps.Map('map', {
+                center: new naver.maps.LatLng(37.5666805, 126.9784147),
+                zoom: 13
+            });
+            
+            // 초기 마커 추가
+            addMarker(37.5666805, 126.9784147, '서울 시청');
+            
+            document.getElementById('status').textContent = '상태: 지도 로드 성공';
+        }
+        
+        // 마커 추가 함수
+        function addMarker(lat, lng, title) {
+            const position = new naver.maps.LatLng(lat, lng);
+            
+            const marker = new naver.maps.Marker({
+                position: position,
+                map: map,
+                title: title
+            });
+            
+            markers.push(marker);
+            
+            // 마커 클릭 이벤트
+            naver.maps.Event.addListener(marker, 'click', function() {
+                showInfoWindow(marker, title);
+            });
+            
+            return marker;
+        }
+        
+        // 정보창 표시
+        function showInfoWindow(marker, content) {
+            if (infoWindow) infoWindow.close();
+            
+            infoWindow = new naver.maps.InfoWindow({
+                content: `<div style="padding:10px;min-width:150px;">${content}</div>`,
+                maxWidth: 300,
+                borderColor: "#ddd"
+            });
+            
+            infoWindow.open(map, marker);
+        }
+        
+        // 카테고리별 검색 (테스트 데이터 사용)
+        function searchPlacesByCategory(category) {
+            // 기존 마커 제거
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+            
+            // 현재 지도 중심
+            const center = map.getCenter();
+            
+            // 테스트 데이터 - 실제로는 API 호출 결과
+            const testPlaces = [];
+            const count = 5 + Math.floor(Math.random() * 5); // 5-10개
+            
+            for (let i = 0; i < count; i++) {
+                // 랜덤 위치 생성 (현재 중심에서 약간 떨어진 곳)
+                const lat = center.lat() + (Math.random() - 0.5) * 0.05;
+                const lng = center.lng() + (Math.random() - 0.5) * 0.05;
+                const name = `${category} ${i+1}`;
+                
+                // 마커 추가
+                const marker = addMarker(lat, lng, name);
+                
+                // 간단한 정보창 내용
+                const content = `
+                    <strong>${name}</strong><br>
+                    <p>카테고리: ${category}</p>
+                    <p>주소: 서울시 중구 세종대로 ${Math.floor(Math.random() * 100) + 1}길</p>
+                    <button onclick="window.open('https://map.naver.com/v5/directions/-/-/${lng},${lat},${encodeURIComponent(name)}/-/walk?c=14,0,0,0,dh', '_blank')">길찾기</button>
+                `;
+                
+                // 마커 클릭 이벤트 업데이트
+                naver.maps.Event.addListener(marker, 'click', function() {
+                    showInfoWindow(marker, content);
+                });
+                
+                testPlaces.push({ lat, lng, name });
+            }
+            
+            document.getElementById('status').textContent = `상태: ${category} ${count}개 표시됨 (테스트 데이터)`;
+            
+            return testPlaces;
+        }
+        
+        // 페이지 로드 시 실행
+        window.onload = function() {
+            try {
+                initMap();
+                
+                // 버튼 이벤트 등록
+                document.getElementById('findGym').addEventListener('click', function() {
+                    searchPlacesByCategory('헬스장');
+                });
+                document.getElementById('findPark').addEventListener('click', function() {
+                    searchPlacesByCategory('공원');
+                });
+                document.getElementById('findTrail').addEventListener('click', function() {
+                    searchPlacesByCategory('산책로');
+                });
+                document.getElementById('findSports').addEventListener('click', function() {
+                    searchPlacesByCategory('스포츠시설');
+                });
+                document.getElementById('findAll').addEventListener('click', function() {
+                    searchPlacesByCategory('운동시설');
+                });
+            } catch (error) {
+                console.error('초기화 오류:', error);
+                document.getElementById('status').textContent = `상태: 오류 발생 - ${error.message}`;
+            }
+        };
+    </script>
+</body>
+</html>

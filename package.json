@@ -1,0 +1,14 @@
+{
+  "name": "navermaptest",
+  "version": "1.0.0",
+  "description": "네이버 지도 API 테스트",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "node-fetch": "^2.6.7"
+  }
+}

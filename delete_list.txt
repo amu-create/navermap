@@ -1,0 +1,19 @@
+# 삭제할 파일 목록
+
+다음 파일들은 더 이상 필요하지 않으므로 삭제해도 됩니다:
+
+1. server.js - 사용하지 않는 서버 파일
+2. server.py - 사용하지 않는 서버 파일
+3. server_with_api.py - 사용하지 않는 서버 파일
+4. script.js - index.html에 통합됨
+5. style.css - index.html에 통합됨
+6. standalone.html - index.html로 대체됨
+7. simple.html - index.html로 대체됨
+8. minimal.html - index.html로 대체됨
+9. searchPlaces.js - index.html에 통합됨
+10. start_server.bat - 더 이상 필요 없음
+
+GitHub에 업로드할 파일:
+- index.html (모든 코드 통합)
+- README.md (프로젝트 설명)
+- LICENSE (MIT 라이센스 파일 추가 권장)

@@ -1,0 +1,202 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+#map {
+    width: 100%;
+    height: 500px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.search-box {
+    display: flex;
+    margin-bottom: 15px;
+    gap: 5px;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.category-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.category-buttons button {
+    background-color: #1ec800; /* 네이버 카페 색상 */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.category-buttons button:hover {
+    background-color: #0da902;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #03c75a; /* 네이버 색상 */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #02a64b;
+}
+
+.status-info {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.status-info p {
+    margin: 5px 0;
+}
+
+#statusText.success {
+    color: #03c75a;
+    font-weight: bold;
+}
+
+#statusText.error {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+#statusText.warning {
+    color: #f39c12;
+    font-weight: bold;
+}
+
+/* 장소 정보창 스타일 */
+.place-info {
+    padding: 5px;
+    font-family: 'Arial', sans-serif;
+}
+
+.place-info h3 {
+    margin: 0 0 8px 0;
+    color: #03c75a;
+    font-size: 16px;
+}
+
+.place-info p {
+    margin: 3px 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.place-info .info-buttons {
+    display: flex;
+    gap: 5px;
+    margin-top: 8px;
+}
+
+.place-info .info-button {
+    background-color: #03c75a;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 13px;
+    flex: 1;
+}
+
+.place-info .info-button:hover {
+    background-color: #02a64b;
+}
+
+/* 카테고리별 버튼 색상 */
+#findGym {
+    background-color: #ff5722;
+}
+#findGym:hover {
+    background-color: #e64a19;
+}
+
+#findPark {
+    background-color: #4caf50;
+}
+#findPark:hover {
+    background-color: #388e3c;
+}
+
+#findTrail {
+    background-color: #2196f3;
+}
+#findTrail:hover {
+    background-color: #1976d2;
+}
+
+#findSports {
+    background-color: #9c27b0;
+}
+#findSports:hover {
+    background-color: #7b1fa2;
+}
+
+#findAll {
+    background-color: #e91e63;
+    font-weight: bold;
+}
+#findAll:hover {
+    background-color: #c2185b;
+}
+
+/* 추천 버튼 스타일 */
+.suggest-button {
+    background-color: #03c75a;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 8px;
+    margin: 2px;
+    cursor: pointer;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.suggest-button:hover {
+    background-color: #02a64b;
+}

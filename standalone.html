@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>네이버 지도 API 테스트</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        #map {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            display: flex;
+            margin-bottom: 15px;
+            gap: 5px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .category-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .category-buttons button {
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: none;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #03c75a; /* 네이버 색상 */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #02a64b;
+        }
+
+        .status-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .status-info p {
+            margin: 5px 0;
+        }
+
+        #statusText.success {
+            color: #03c75a;
+            font-weight: bold;
+        }
+
+        #statusText.error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        #statusText.warning {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        /* 장소 정보창 스타일 */
+        .place-info {
+            padding: 5px;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .place-info h3 {
+            margin: 0 0 8px 0;
+            color: #03c75a;
+            font-size: 16px;
+        }
+
+        .place-info p {
+            margin: 3px 0;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .place-info .info-buttons {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .place-info .info-button {
+            background-color: #03c75a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 13px;
+            flex: 1;
+        }
+
+        .place-info .info-button:hover {
+            background-color: #02a64b;
+        }
+
+        /* 카테고리별 버튼 색상 */
+        #findGym {
+            background-color: #ff5722;
+        }
+        #findGym:hover {
+            background-color: #e64a19;
+        }
+
+        #findPark {
+            background-color: #4caf50;
+        }
+        #findPark:hover {
+            background-color: #388e3c;
+        }
+
+        #findTrail {
+            background-color: #2196f3;
+        }
+        #findTrail:hover {
+            background-color: #1976d2;
+        }
+
+        #findSports {
+            background-color: #9c27b0;
+        }
+        #findSports:hover {
+            background-color: #7b1fa2;
+        }
+
+        #findSwim {
+            background-color: #00bcd4;
+        }
+        #findSwim:hover {
+            background-color: #0097a7;
+        }
+
+        #findAll {
+            background-color: #e91e63;
+            font-weight: bold;
+        }
+        #findAll:hover {
+            background-color: #c2185b;
+        }
+
+        /* 추천 버튼 스타일 */
+        .suggest-button {
+            background-color: #03c75a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 3px 8px;
+            margin: 2px;
+            cursor: pointer;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        .suggest-button:hover {
+            background-color: #02a64b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>네이버 지도 API 테스트</h1>
+        <div id="map"></div>
+        <div class="search-box">
+            <input type="text" id="address" placeholder="주소나 장소를 입력하세요">
+            <button id="search">검색</button>
+        </div>
+        <div class="category-buttons">
+            <button id="findGym">헬스장 찾기</button>
+            <button id="findPark">공원 찾기</button>
+            <button id="findTrail">산책로 찾기</button>
+            <button id="findSports">스포츠 시설 찾기</button>
+            <button id="findSwim">수영장 찾기</button>
+            <button id="findAll">주변 운동 시설 모두</button>
+        </div>
+        <div class="controls">
+            <button id="addMarker">마커 추가</button>
+            <button id="clearMarkers">마커 지우기</button>
+            <button id="getCurrentLocation">현재 위치</button>
+        </div>
+        <div class="status-info">
+            <p id="serverInfo">서버 정보: <span id="serverUrl"></span></p>
+            <p id="apiStatus">지도 API 상태: <span id="statusText">초기화 중...</span></p>
+        </div>
+    </div>
+
+    <!-- 네이버 지도 API 스크립트 -->
+    <script>
+        // 네이버 API 키 설정
+        const CLIENT_ID = 'me6liq8hnh';
+        const CLIENT_SECRET = 'Yg9lyWHftlXfcavEbdz2rT5VBdr9ZcsmVmZHtAtQ';
+        
+        // 전역 변수 선언
+        let map;
+        let markers = [];
+        let categoryMarkers = [];
+        let mapInitialized = false;
+        let lastSearchedCategory = '';
+        
+        // 페이지 로드 시 실행
+        window.onload = function() {
+            document.getElementById('serverUrl').textContent = window.location.href;
+            
+            try {
+                initMap();
+                
+                // 버튼 이벤트 리스너 등록
+                document.getElementById('addMarker').addEventListener('click', addRandomMarker);
+                document.getElementById('clearMarkers').addEventListener('click', clearAllMarkers);
+                document.getElementById('search').addEventListener('click', searchAddress);
+                document.getElementById('getCurrentLocation').addEventListener('click', getCurrentLocation);
+                
+                // 카테고리 검색 버튼
+                document.getElementById('findGym').addEventListener('click', function() {
+                    searchPlacesByCategory('헬스장');
+                });
+                document.getElementById('findPark').addEventListener('click', function() {
+                    searchPlacesByCategory('공원');
+                });
+                document.getElementById('findTrail').addEventListener('click', function() {
+                    searchPlacesByCategory('산책로');
+                });
+                document.getElementById('findSports').addEventListener('click', function() {
+                    searchPlacesByCategory('스포츠');
+                });
+                document.getElementById('findSwim').addEventListener('click', function() {
+                    searchPlacesByCategory('수영장');
+                });
+                document.getElementById('findAll').addEventListener('click', function() {
+                    searchPlacesByCategory('운동 시설', true);
+                });
+                
+                // Enter 키로 검색
+                document.getElementById('address').addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchAddress();
+                    }
+                });
+            } catch (error) {
+                console.error('초기화 오류:', error);
+                document.getElementById('statusText').textContent = `초기화 오류: ${error.message}`;
+                document.getElementById('statusText').className = 'error';
+            }
+        };
+        
+        // 지도 초기화 함수
+        function initMap() {
+            try {
+                // 네이버 지도 API 직접 로드 (동적 로드 - 스크립트 태그 대신 사용)
+                // 인증 방식을 ncpClientId에서 submodules로 변경
+                const script = document.createElement('script');
+                // NCPKEY 대신 직접 키를 입력하는 방식으로 변경
+                script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${CLIENT_ID}`;
+                script.async = true;
+                script.onload = function() {
+                    // 서울 시청을 중심으로 지도 생성
+                    const mapOptions = {
+                        center: new naver.maps.LatLng(37.5666805, 126.9784147),
+                        zoom: 13,
+                        mapTypeId: naver.maps.MapTypeId.NORMAL,
+                        mapDataControl: true,
+                        scaleControl: true,
+                        logoControl: true,
+                        mapTypeControl: true,
+                        zoomControl: true
+                    };
+                    
+                    // 지도 객체 생성
+                    map = new naver.maps.Map('map', mapOptions);
+                    mapInitialized = true;
+                    
+                    // 초기 마커 추가
+                    addMarker(37.5666805, 126.9784147, '서울 시청');
+                    
+                    // 지도 클릭 이벤트 처리
+                    naver.maps.Event.addListener(map, 'click', function(e) {
+                        const position = e.coord;
+                        addMarker(position.lat(), position.lng(), '선택한 위치');
+                    });
+                    
+                    // 지도 초기화 성공 표시
+                    document.getElementById('statusText').textContent = '지도 로드 성공';
+                    document.getElementById('statusText').className = 'success';
+                    
+                    // 지도 정보 출력
+                    console.log('지도 초기화 성공:', map.getCenter());
+                    
+                    // 지도 이동 완료 이벤트 (드래그 후 새로운 위치에서 자동 검색)
+                    let lastSearchTime = 0;
+                    naver.maps.Event.addListener(map, 'dragend', function() {
+                        // 너무 빈번한 검색 방지 (3초 간격)
+                        const now = Date.now();
+                        if (now - lastSearchTime < 3000) return;
+                        
+                        // 마지막 사용한 카테고리가 있으면 자동 검색
+                        if (lastSearchedCategory) {
+                            lastSearchTime = now;
+                            searchPlacesByCategory(lastSearchedCategory);
+                        }
+                    });
+                };
+                document.head.appendChild(script);
+            } catch (error) {
+                console.error('지도 초기화 오류:', error);
+                document.getElementById('statusText').textContent = `지도 초기화 오류: ${error.message}`;
+                document.getElementById('statusText').className = 'error';
+                mapInitialized = false;
+            }
+        }
+        
+        // 마커 추가 함수
+        function addMarker(lat, lng, title) {
+            if (!mapInitialized || !naver || !naver.maps) {
+                console.error('지도가 초기화되지 않았습니다.');
+                return null;
+            }
+            
+            const position = new naver.maps.LatLng(lat, lng);
+            
+            // 마커 생성
+            const marker = new naver.maps.Marker({
+                position: position,
+                map: map,
+                title: title,
+                animation: naver.maps.Animation.DROP,
+                icon: {
+                    content: `<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url('https://navermaps.github.io/maps.js.ncp/docs/img/cluster-marker-1.png') no-repeat;background-size:contain;">${markers.length + 1}</div>`,
+                    anchor: new naver.maps.Point(20, 20)
+                }
+            });
+            
+            // 마커 배열에 추가
+            markers.push(marker);
+            
+            // 마커 클릭 시 정보창 표시
+            naver.maps.Event.addListener(marker, 'click', function() {
+                showInfoWindow(marker, title);
+            });
+            
+            return marker;
+        }
+        
+        // 카테고리 마커 추가 함수 - 다른 아이콘 사용
+        function addCategoryMarker(lat, lng, title, category) {
+            if (!mapInitialized || !naver || !naver.maps) {
+                console.error('지도가 초기화되지 않았습니다.');
+                return null;
+            }
+            
+            const position = new naver.maps.LatLng(lat, lng);
+            
+            // 카테고리별 아이콘 색상 설정
+            let iconColor = '#03c75a'; // 기본 색상 (네이버 색상)
+            
+            // 카테고리별 색상 지정
+            const categoryColors = {
+                '헬스': '#ff5722',       // 주황색 - 헬스장
+                '피트니스': '#ff5722',   // 주황색 - 피트니스
+                '공원': '#4caf50',       // 녹색 - 공원
+                '산책': '#2196f3',       // 파란색 - 산책로
+                '체육': '#9c27b0',       // 보라색 - 체육시설
+                '스포츠': '#9c27b0',     // 보라색 - 스포츠 시설
+                '수영': '#00bcd4',       // 청록색 - 수영장
+                '요가': '#e91e63',       // 분홍색 - 요가/필라테스
+                '필라테스': '#e91e63',   // 분홍색 - 요가/필라테스
+                '태권도': '#795548',     // 갈색 - 무술
+                '유도': '#795548',       // 갈색 - 무술
+                '복싱': '#795548',       // 갈색 - 무술
+                '배드민턴': '#ffc107',   // 노랑색 - 라켓 스포츠
+                '테니스': '#ffc107',     // 노랑색 - 라켓 스포츠
+                '축구': '#8bc34a',       // 연두색 - 구기 스포츠
+                '농구': '#8bc34a',       // 연두색 - 구기 스포츠
+                '야구': '#8bc34a',       // 연두색 - 구기 스포츠
+                '골프': '#3f51b5',       // 남색 - 골프
+                '클라이밍': '#ff9800',   // 주황색 - 클라이밍
+                '볼링': '#607d8b',       // 회색 - 실내 스포츠
+                '당구': '#607d8b'        // 회색 - 실내 스포츠
+            };
+            
+            // 카테고리에 해당하는 색상 찾기
+            for (const key in categoryColors) {
+                if (category.includes(key)) {
+                    iconColor = categoryColors[key];
+                    break;
+                }
+            }
+            
+            // 마커 생성
+            const marker = new naver.maps.Marker({
+                position: position,
+                map: map,
+                title: title,
+                animation: naver.maps.Animation.DROP,
+                icon: {
+                    content: `<div style="cursor:pointer;width:30px;height:30px;line-height:30px;font-size:12px;color:white;text-align:center;font-weight:bold;background:${iconColor};border-radius:50%;border:2px solid white;box-shadow:0 2px 5px rgba(0,0,0,0.2);">${categoryMarkers.length + 1}</div>`,
+                    anchor: new naver.maps.Point(15, 15)
+                }
+            });
+            
+            // 카테고리 마커 배열에 추가
+            categoryMarkers.push(marker);
+            
+            // 마커 클릭 시 정보창 표시
+            naver.maps.Event.addListener(marker, 'click', function() {
+                showInfoWindow(marker, `<strong>${title}</strong><br>카테고리: ${category}`);
+            });
+            
+            return marker;
+        }
+        
+        // 랜덤 위치에 마커 추가 (버튼 클릭용)
+        function addRandomMarker() {
+            if (!mapInitialized || !naver || !naver.maps) {
+                alert('지도가 초기화되지 않았습니다.');
+                return;
+            }
+            
+            // 현재 지도 중심 기준으로 랜덤 위치 생성
+            const center = map.getCenter();
+            const lat = center.lat() + (Math.random() - 0.5) * 0.05;
+            const lng = center.lng() + (Math.random() - 0.5) * 0.05;
+            
+            const marker = addMarker(lat, lng, '랜덤 위치');
+            if (marker) {
+                showInfoWindow(marker, `랜덤 위치<br>위도: ${lat.toFixed(6)}<br>경도: ${lng.toFixed(6)}`);
+            }
+        }
+        
+        // 모든 마커 제거 함수
+        function clearAllMarkers() {
+            if (!naver || !naver.maps) return;
+            
+            // 기본 마커 제거
+            for (let i = 0; i < markers.length; i++) {
+                markers[i].setMap(null);
+            }
+            markers = [];
+            
+            // 카테고리 마커 제거
+            for (let i = 0; i < categoryMarkers.length; i++) {
+                categoryMarkers[i].setMap(null);
+            }
+            categoryMarkers = [];
+            
+            // 정보창 닫기
+            if (window.infoWindow) {
+                window.infoWindow.close();
+            }
+            
+            document.getElementById('statusText').textContent = '모든 마커 제거됨';
+        }
+        
+        // 정보창 표시 함수
+        function showInfoWindow(marker, content) {
+            if (!naver || !naver.maps) return;
+            
+            // 기존 정보창이 있으면 닫기
+            if (window.infoWindow) {
+                window.infoWindow.close();
+            }
+            
+            // 새 정보창 생성
+            window.infoWindow = new naver.maps.InfoWindow({
+                content: `<div style="padding:10px;min-width:200px;text-align:center;"><p>${content}</p></div>`,
+                maxWidth: 300,
+                backgroundColor: "#fff",
+                borderColor: "#ddd",
+                borderWidth: 2,
+                anchorSkew: true,
+                anchorSize: new naver.maps.Size(10, 10),
+                pixelOffset: new naver.maps.Point(10, -10)
+            });
+            
+            // 정보창 열기
+            window.infoWindow.open(map, marker);
+        }
+        
+        // 주소 검색 함수
+        function searchAddress() {
+            if (!mapInitialized || !naver || !naver.maps) {
+                alert('지도가 초기화되지 않았습니다.');
+                return;
+            }
+            
+            const address = document.getElementById('address').value;
+            
+            if (!address) {
+                alert('주소나 장소를 입력해주세요');
+                return;
+            }
+            
+            // 주소 검색 대신 테스트 데이터 사용 (간단한 테스트용)
+            // 서울 지역의 몇 가지 주요 위치
+            const testLocations = {
+                '서울시청': { lat: 37.5666805, lng: 126.9784147, address: '서울특별시 중구 세종대로 110' },
+                '강남역': { lat: 37.4980854, lng: 127.027729, address: '서울특별시 강남구 강남대로 396' },
+                '홍대입구': { lat: 37.5571709, lng: 126.9251802, address: '서울특별시 마포구 양화로 지하 160' },
+                '여의도': { lat: 37.5251644, lng: 126.9255491, address: '서울특별시 영등포구 여의동' },
+                '광화문': { lat: 37.5760252, lng: 126.9769962, address: '서울특별시 종로구 세종로 1-1' },
+                '잠실': { lat: 37.5139443, lng: 127.1040335, address: '서울특별시 송파구 올림픽로 240' },
+                '명동': { lat: 37.5634132, lng: 126.9846066, address: '서울특별시 중구 명동길' }
+            };
+            
+            // 임의의 위치 선택 (기본 서울시청)
+            let location = testLocations['서울시청'];
+            
+            // 입력된 주소와 유사한 테스트 위치 검색
+            for (const key in testLocations) {
+                if (address.includes(key) || key.includes(address)) {
+                    location = testLocations[key];
+                    break;
+                }
+            }
+            
+            // 검색 결과 위치로 이동
+            const position = new naver.maps.LatLng(location.lat, location.lng);
+            map.setCenter(position);
+            
+            // 마커 추가
+            const marker = addMarker(location.lat, location.lng, address);
+            
+            // 정보창 표시
+            let content = `<strong>${address}</strong><br/>`;
+            content += `도로명주소: ${location.address}<br/>`;
+            
+            showInfoWindow(marker, content);
+            
+            document.getElementById('statusText').textContent = '주소 검색 완료 (테스트 데이터)';
+            document.getElementById('statusText').className = 'success';
+        }
+        
+        // 현재 위치 가져오기 함수
+        function getCurrentLocation() {
+            if (!mapInitialized || !naver || !naver.maps) {
+                alert('지도가 초기화되지 않았습니다.');
+                return;
+            }
+            
+            if (navigator.geolocation) {
+                document.getElementById('statusText').textContent = '위치 정보 가져오는 중...';
+                
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const currentPosition = new naver.maps.LatLng(lat, lng);
+                    
+                    // 지도 이동
+                    map.setCenter(currentPosition);
+                    map.setZoom(15); // 좀 더 가까이 보기
+                    
+                    // 마커 추가
+                    const marker = addMarker(lat, lng, '현재 위치');
+                    
+                    // 정보창 표시
+                    showInfoWindow(marker, '현재 위치');
+                    
+                    document.getElementById('statusText').textContent = '현재 위치 가져오기 성공';
+                    document.getElementById('statusText').className = 'success';
+                }, function(error) {
+                    console.error('위치 정보 오류:', error);
+                    document.getElementById('statusText').textContent = `위치 정보 오류: ${error.message}`;
+                    document.getElementById('statusText').className = 'error';
+                    alert('위치 정보를 가져올 수 없습니다. ' + error.message);
+                }, {
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: 10000
+                });
+            } else {
+                alert('이 브라우저는 위치 정보 기능을 지원하지 않습니다.');
+            }
+        }
+
+        // 테스트 데이터 생성 함수 (API 직접 호출 불가능할 때 테스트용)
+        function generateFakePlaces(center, category) {
+            // 카테고리별 실제 같은 테스트 데이터
+            const categoryData = {
+                '헬스장': [
+                    { name: '24시 스마일 피트니스', dist: 0.008, dir: 'ne', hours: '00:00 ~ 24:00', rating: 4.8, tel: '02-123-4567' },
+                    { name: '파워 헬스클럽', dist: 0.012, dir: 'sw', hours: '06:00 ~ 22:00', rating: 4.5, tel: '02-987-6543' },
+                    { name: '바디챌린지 PT', dist: 0.005, dir: 'e', hours: '09:00 ~ 23:00', rating: 4.9, tel: '010-1234-5678' },
+                    { name: '액티브 스포츠센터', dist: 0.015, dir: 'n', hours: '06:00 ~ 24:00', rating: 4.4, tel: '02-456-7890' },
+                    { name: '헬스타임 피트니스', dist: 0.01, dir: 'se', hours: '05:30 ~ 23:30', rating: 4.7, tel: '02-345-6789' }
+                ],
+                '피트니스': [
+                    { name: '블루라인 피트니스', dist: 0.009, dir: 'nw', hours: '06:00 ~ 22:30', rating: 4.6, tel: '02-567-8901' },
+                    { name: '애플짐 피트니스', dist: 0.011, dir: 's', hours: '06:00 ~ 22:00', rating: 4.3, tel: '02-678-9012' },
+                    { name: '퍼스트클래스 PT', dist: 0.007, dir: 'ne', hours: '08:00 ~ 22:00', rating: 4.8, tel: '010-9876-5432' }
+                ],
+                '공원': [
+                    { name: '시민의숲 공원', dist: 0.02, dir: 'w', hours: '24시간 개방', rating: 4.7, tel: '02-120' },
+                    { name: '한강시민공원', dist: 0.025, dir: 's', hours: '24시간 개방', rating: 4.9, tel: '02-120' },
+                    { name: '중앙공원', dist: 0.015, dir: 'ne', hours: '05:00 ~ 22:00', rating: 4.5, tel: '02-120' },
+                    { name: '어린이대공원', dist: 0.03, dir: 'e', hours: '05:00 ~ 21:00', rating: 4.8, tel: '02-450-9311' }
+                ],
+                '산책로': [
+                    { name: '청계천 산책로', dist: 0.018, dir: 'n', hours: '24시간 개방', rating: 4.9, tel: '02-120' },
+                    { name: '북한산 둘레길', dist: 0.035, dir: 'n', hours: '일출 ~ 일몰', rating: 4.7, tel: '02-120' },
+                    { name: '안양천 자전거길', dist: 0.022, dir: 'sw', hours: '24시간 개방', rating: 4.5, tel: '02-120' },
+                    { name: '서울숲 산책로', dist: 0.019, dir: 'e', hours: '05:00 ~ 21:00', rating: 4.8, tel: '02-460-9372' }
+                ],
+                '수영장': [
+                    { name: '블루웨이브 수영장', dist: 0.014, dir: 'se', hours: '06:00 ~ 21:00', rating: 4.6, tel: '02-789-0123' },
+                    { name: '시립종합수영장', dist: 0.022, dir: 'ne', hours: '06:00 ~ 21:30', rating: 4.4, tel: '02-890-1234' },
+                    { name: '아쿠아스포츠센터', dist: 0.017, dir: 'sw', hours: '05:30 ~ 22:00', rating: 4.7, tel: '02-901-2345' }
+                ],
+                '체육시설': [
+                    { name: '종합체육관', dist: 0.025, dir: 'n', hours: '06:00 ~ 22:00', rating: 4.5, tel: '02-123-5678' },
+                    { name: '국민체육센터', dist: 0.02, dir: 'w', hours: '06:00 ~ 21:00', rating: 4.3, tel: '02-234-5678' },
+                    { name: '시립스포츠센터', dist: 0.018, dir: 'e', hours: '06:00 ~ 22:00', rating: 4.6, tel: '02-345-6789' }
+                ],
+                '요가': [
+                    { name: '서울요가', dist: 0.01, dir: 'n', hours: '06:00 ~ 21:00', rating: 4.8, tel: '02-987-6543' },
+                    { name: '요가라이프', dist: 0.008, dir: 'se', hours: '09:00 ~ 21:30', rating: 4.9, tel: '02-876-5432' },
+                    { name: '마이요가', dist: 0.012, dir: 'w', hours: '08:00 ~ 20:00', rating: 4.7, tel: '02-765-4321' }
+                ],
+                '테니스': [
+                    { name: '그린테니스장', dist: 0.03, dir: 'ne', hours: '06:00 ~ 22:00', rating: 4.4, tel: '02-432-1098' },
+                    { name: '시민테니스코트', dist: 0.028, dir: 's', hours: '07:00 ~ 21:00', rating: 4.5, tel: '02-321-0987' }
+                ],
+                '축구장': [
+                    { name: '종합운동장 축구장', dist: 0.04, dir: 'sw', hours: '09:00 ~ 18:00', rating: 4.6, tel: '02-210-9876' },
+                    { name: '시민축구장', dist: 0.035, dir: 'ne', hours: '08:00 ~ 20:00', rating: 4.3, tel: '02-109-8765' }
+                ],
+                '농구장': [
+                    { name: '농구코트', dist: 0.015, dir: 'nw', hours: '24시간 개방', rating: 4.2, tel: '02-120' },
+                    { name: '시립농구장', dist: 0.02, dir: 'se', hours: '09:00 ~ 21:00', rating: 4.4, tel: '02-987-6789' }
+                ],
+                '스포츠': [
+                    { name: '스포츠 복합센터', dist: 0.022, dir: 'ne', hours: '06:00 ~ 22:00', rating: 4.5, tel: '02-345-6789' },
+                    { name: '실내스포츠센터', dist: 0.018, dir: 'sw', hours: '08:00 ~ 22:00', rating: 4.6, tel: '02-456-7890' },
+                    { name: '마을체육관', dist: 0.015, dir: 'se', hours: '06:00 ~ 23:00', rating: 4.3, tel: '02-567-8901' }
+                ]
+            };
+            
+            // 다른 카테고리가 입력되면 기본 데이터 사용
+            const defaultPlaces = [
+                { name: `${category} 센터 1`, dist: 0.01, dir: 'n', hours: '08:00 ~ 20:00', rating: 4.5, tel: '02-123-4567' },
+                { name: `${category} 클럽 2`, dist: 0.015, dir: 's', hours: '09:00 ~ 21:00', rating: 4.3, tel: '02-234-5678' },
+                { name: `${category} 스포츠 3`, dist: 0.02, dir: 'e', hours: '06:00 ~ 22:00', rating: 4.7, tel: '02-345-6789' },
+                { name: `${category} 시설 4`, dist: 0.025, dir: 'w', hours: '07:00 ~ 23:00', rating: 4.2, tel: '02-456-7890' }
+            ];
+            
+            // 운동 시설 모두 검색인 경우
+            if (category === '운동 시설' && category.includes('모두')) {
+                const allPlaces = [];
+                
+                // 여러 카테고리의 데이터를 한번에 생성
+                const categories = ['헬스장', '피트니스', '공원', '산책로', '수영장', '스포츠'];
+                
+                categories.forEach(cat => {
+                    let placesToAdd = [];
+                    // 카테고리에 맞는 장소 데이터 선택
+                    if (categoryData[cat]) {
+                        placesToAdd = categoryData[cat];
+                    } else {
+                        placesToAdd = defaultPlaces;
+                    }
+                    
+                    // 각 장소 데이터에 좌표 계산
+                    placesToAdd.forEach(place => {
+                        const coords = getCoordByDirection(center, place.dist, place.dir);
+                        allPlaces.push({
+                            name: place.name,
+                            lat: coords.lat,
+                            lng: coords.lng,
+                            address: `서울시 중구 을지로 ${Math.floor(Math.random() * 100) + 1}길 ${Math.floor(Math.random() * 30) + 1}`,
+                            category: cat,
+                            hours: place.hours,
+                            rating: place.rating,
+                            tel: place.tel
+                        });
+                    });
+                });
+                
+                return allPlaces;
+            }
+            
+            // 카테고리에 맞는 장소 데이터 선택
+            let placesList = defaultPlaces;
+            for (const key in categoryData) {
+                if (category.includes(key)) {
+                    placesList = categoryData[key];
+                    break;
+                }
+            }
+            
+            // 지정된 위치에 장소 데이터 생성
+            const places = [];
+            placesList.forEach(place => {
+                const coords = getCoordByDirection(center, place.dist, place.dir);
+                places.push({
+                    name: place.name,
+                    lat: coords.lat,
+                    lng: coords.lng,
+                    address: `서울시 중구 을지로 ${Math.floor(Math.random() * 100) + 1}길 ${Math.floor(Math.random() * 30) + 1}`,
+                    category: category,
+                    hours: place.hours,
+                    rating: place.rating,
+                    tel: place.tel
+                });
+            });
+            
+            // 약간의 랜덤 장소 추가 (2~3개)
+            const randomCount = Math.floor(Math.random() * 2) + 2;
+            for (let i = 0; i < randomCount; i++) {
+                const randomDist = Math.random() * 0.03 + 0.005; // 500m ~ 3.5km
+                const directions = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
+                const randomDir = directions[Math.floor(Math.random() * directions.length)];
+                const coords = getCoordByDirection(center, randomDist, randomDir);
+                
+                // 랜덤 장소 이름 생성
+                const namePrefix = ['뉴', '더', '그랜드', '로얄', '스마트', '블루', '그린', '레드', '골드', '실버'];
+                const nameSuffix = ['센터', '클럽', '짐', '스튜디오', '아카데미', '플레이스', '존', '스테이션'];
+                
+                places.push({
+                    name: `${namePrefix[Math.floor(Math.random() * namePrefix.length)]} ${category} ${nameSuffix[Math.floor(Math.random() * nameSuffix.length)]}`,
+                    lat: coords.lat,
+                    lng: coords.lng,
+                    address: `서울시 ${['종로구', '중구', '용산구', '성동구', '광진구'][Math.floor(Math.random() * 5)]} ${['을지로', '종로', '대학로', '강남대로', '테헤란로'][Math.floor(Math.random() * 5)]} ${Math.floor(Math.random() * 100) + 1}길 ${Math.floor(Math.random() * 30) + 1}`,
+                    category: category,
+                    hours: `${Math.floor(Math.random() * 4) + 6}:00 ~ ${Math.floor(Math.random() * 4) + 20}:00`,
+                    rating: (Math.random() * 1.5 + 3.5).toFixed(1),
+                    tel: `02-${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`
+                });
+            }
+            
+            return places;
+        }
+        
+        // 방향에 따른 좌표 계산 함수
+        function getCoordByDirection(center, dist, dir) {
+            // 거리를 위도/경도 차이로 변환 (대략적인 변환, 정확하지 않음)
+            // 위도 1도 = 약 111km, 경도 1도 = 약 111km * cos(latitude)
+            const latDist = dist / 111; // km -> 도 단위로 변환
+            const lngFactor = Math.cos(center.lat() * Math.PI / 180);
+            const lngDist = dist / (111 * lngFactor);
+            
+            let lat = center.lat();
+            let lng = center.lng();
+            
+            // 방향에 따라 좌표 조정
+            if (dir.includes('n')) lat += latDist;
+            if (dir.includes('s')) lat -= latDist;
+            if (dir.includes('e')) lng += lngDist;
+            if (dir.includes('w')) lng -= lngDist;
+            
+            return { lat, lng };
+        }
+        
+        // 카테고리별 검색 함수
+        function searchPlacesByCategory(category, isMultiple = false) {
+            // 마지막 검색 카테고리 저장 (여러 카테고리 검색이 아닌 경우에만)
+            if (!isMultiple) {
+                lastSearchedCategory = category;
+            }
+            
+            if (!mapInitialized || !naver || !naver.maps) {
+                alert('지도가 초기화되지 않았습니다.');
+                return;
+            }
+            
+            // 현재 지도 중심점
+            const center = map.getCenter();
+            
+            document.getElementById('statusText').textContent = `${category} 검색 중...`;
+            document.getElementById('statusText').className = '';
+            
+            // 기존 카테고리 마커 제거 (새로운 검색 시)
+            if (!isMultiple) {
+                // 카테고리 마커 제거
+                for (let i = 0; i < categoryMarkers.length; i++) {
+                    categoryMarkers[i].setMap(null);
+                }
+                categoryMarkers = [];
+            }
+            
+            // 테스트 데이터 생성
+            console.log(`'${category}' 카테고리 검색 중... (로컬 데이터 사용)`);
+            const fakeData = generateFakePlaces(center, category);
+            
+            // 검색 결과를 지도에 표시
+            displayPlacesOnMap(fakeData, category);
+            
+            document.getElementById('statusText').textContent = `${category} ${fakeData.length}개 검색 완료 (로컬 테스트 데이터)`;
+            document.getElementById('statusText').className = 'success';
+        }
+        
+        // 검색 결과를 지도에 표시하는 함수
+        function displayPlacesOnMap(places, category) {
+            if (!naver || !naver.maps) return;
+            
+            // 지도 범위 설정을 위한 경계 객체
+            const bounds = new naver.maps.LatLngBounds();
+            
+            // 각 장소에 마커 생성
+            places.forEach((place, index) => {
+                const position = new naver.maps.LatLng(place.lat, place.lng);
+                
+                // 마커 추가
+                const marker = addCategoryMarker(place.lat, place.lng, place.name, place.category || category);
+                
+                // 정보창 내용 생성
+                let infoContent = `
+                    <div class="place-info">
+                        <h3>${place.name}</h3>
+                        <p><strong>카테고리:</strong> ${place.category || category}</p>
+                        <p><strong>주소:</strong> ${place.address || '정보 없음'}</p>
+                        ${place.hours ? `<p><strong>운영시간:</strong> ${place.hours}</p>` : ''}
+                        ${place.rating ? `<p><strong>평점:</strong> ${place.rating}/5.0</p>` : ''}
+                        ${place.tel ? `<p><strong>전화:</strong> ${place.tel}</p>` : ''}
+                        <div class="info-buttons">
+                            <button onclick="findPathTo(${place.lat}, ${place.lng}, '${place.name.replace(/'/g, "\\'")}')" class="info-button">길찾기</button>
+                        </div>
+                    </div>
+                `;
+                
+                // 마커 클릭 시 정보창 표시
+                naver.maps.Event.addListener(marker, 'click', function() {
+                    if (window.infoWindow) {
+                        window.infoWindow.close();
+                    }
+                    
+                    window.infoWindow = new naver.maps.InfoWindow({
+                        content: infoContent,
+                        maxWidth: 300,
+                        backgroundColor: "#fff",
+                        borderColor: "#ddd",
+                        borderWidth: 2,
+                        anchorSkew: true,
+                        anchorSize: new naver.maps.Size(10, 10),
+                        pixelOffset: new naver.maps.Point(10, -10)
+                    });
+                    
+                    window.infoWindow.open(map, marker);
+                });
+                
+                // 경계에 위치 추가
+                bounds.extend(position);
+            });
+            
+            // 결과가 있으면 모든 결과가 보이도록 지도 조정
+            if (places.length > 0) {
+                map.fitBounds(bounds);
+                
+                // 결과가 하나만 있을 경우 적절한 줌 레벨 설정
+                if (places.length === 1) {
+                    map.setZoom(15);
+                }
+            }
+        }
+        
+        // 길찾기 함수
+        function findPathTo(lat, lng, name) {
+            // 네이버 지도 길찾기 URL 생성
+            const naverMapUrl = `https://map.naver.com/v5/directions/-/-/${lng},${lat},${encodeURIComponent(name)}/-/walk?c=14,0,0,0,dh`;
+            
+            // 새 창에서 네이버 지도 길찾기 열기
+            window.open(naverMapUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
